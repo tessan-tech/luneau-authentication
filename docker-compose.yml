@@ -5,7 +5,7 @@ services:
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: kjshfjkdhsjfhsd
+      MONGO_INITDB_ROOT_PASSWORD: U9jC4g9MXuawuxbHHwDJ
     ports:
       - 27017:27017
   mongo-express:
@@ -15,6 +15,14 @@ services:
       - 8081:8081
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: kjshfjkdhsjfhsd
+      ME_CONFIG_MONGODB_ADMINPASSWORD: U9jC4g9MXuawuxbHHwDJ
+      ME_CONFIG_BASICAUTH_USERNAME: luneau
+      ME_CONFIG_BASICAUTH_PASSWORD: 1THPZLMpkSmfLdj60cPHbb
     depends_on:
       - mongo
+  auth-server:
+    build: .
+    ports:
+      - 3000:80
+    environment:
+      AppSettings__Mongo__ConnectionString: "mongodb://root:U9jC4g9MXuawuxbHHwDJ@mongo:27017"

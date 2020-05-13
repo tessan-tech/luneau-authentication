@@ -1,21 +1,15 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using LuneauAuthentication.Models;
 using LuneauAuthentication.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Microsoft.OpenApi.Models;
 
 namespace LuneauAuthentication
 {
@@ -28,14 +22,25 @@ namespace LuneauAuthentication
 
         public IConfiguration Configuration { get; }
 
+        private AppSettings ConfigureSettings(IServiceCollection services)
+        {
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+            return appSettingsSection.Get<AppSettings>();
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
             ConfigureAuthentication(services);
-            var appSettingsSection = Configuration.GetSection("AppSettings");
-            services.Configure<AppSettings>(appSettingsSection);
-            services.AddSingleton(sp => GetMongoCollection<Organization>(sp, "organization"));
+            ConfigureSettings(services);
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Authentication API", Version = "v1" });
+            });
+            services
+                .AddSingleton(sp => GetMongoCollection<Organization>(sp, "organization"))
+                .AddSingleton<JwtService>(); ;
         }
 
         public void ConfigureAuthentication(IServiceCollection services)
@@ -43,7 +48,7 @@ namespace LuneauAuthentication
             services
                 .AddAuthentication()
                 .AddScheme<AuthenticationSchemeOptions, AdminAuthHandler>("AdminAuthentication", null)
-                .AddScheme<AuthenticationSchemeOptions, AdminAuthHandler>("OrganizationAuthentication", null);
+                .AddScheme<AuthenticationSchemeOptions, OrganizationAuthHandler>("OrganizationAuthentication", null);
         }
 
         public IMongoCollection<TDocument> GetMongoCollection<TDocument>(IServiceProvider serviceProvider, string collectionName)
@@ -61,7 +66,14 @@ namespace LuneauAuthentication
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseSwagger();
+
             app.UseHttpsRedirection();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Authentication API V1");
+            });
 
             app.UseRouting();
 

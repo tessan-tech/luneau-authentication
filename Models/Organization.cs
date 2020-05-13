@@ -1,22 +1,21 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
+using System.Web;
 
 namespace LuneauAuthentication.Models
 {
     public class Organization
     {
-        public Organization()
+        public Organization(string name)
         {
-            ApiKey = Convert.ToBase64String(new HMACSHA256().Key);
+            ApiKey = HttpUtility.UrlEncode(Convert.ToBase64String(new HMACSHA256().Key));
+            Name = name;
         }
 
         [BsonId]
         public Guid Id { get; set; }
+        public string Name { get; set; }
         public string ApiKey { get; set; }
     }
 }

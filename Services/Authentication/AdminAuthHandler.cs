@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
@@ -33,16 +30,20 @@ namespace LuneauAuthentication.Services
                 return AuthenticateResult.Fail("Missing Authorization Header");
 
             var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
+            if (authHeader.Scheme != "Basic")
+                return AuthenticateResult.Fail("Invalid scheme, must be Basic");
+            if (String.IsNullOrEmpty(authHeader.Parameter))
+                return AuthenticateResult.Fail("Invalid auth header for basic auth");
             var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
             var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':');
+            if (credentials.Length != 2)
+                return AuthenticateResult.Fail("Invalid auth header for basic auth");
             var username = credentials[0];
             var password = credentials[1];
             if (username != AdminCredentials.Username || password != AdminCredentials.Password)
                 return AuthenticateResult.Fail("Invalid username or password");
 
-            var claims = new[] {
-                    new Claim(ClaimTypes.Role, "administrator"),
-                };
+            var claims = new Claim[0];
             var claimIdentity = new ClaimsIdentity(claims, "basic");
             var ticket = new AuthenticationTicket(new ClaimsPrincipal(claimIdentity), "AdminAuthentication");
 

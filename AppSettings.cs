@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace LuneauAuthentication
+﻿namespace LuneauAuthentication
 {
     public class JwtInfos
     {
         public string PrivateKey { get; set; }
         public string PublicKey { get; set; }
-        public int ExpirationTime { get; set; }
+        public int ExpirationMinutes { get; set; }
     }
 
     public class AdminCredentialInfos
     {
-        public string Username;
-        public string Password;
+        public string Username { get; set; }
+        public string Password { get; set; }
     }
 
     public class MongoInfos
     {
-        public string ConnectionString;
-        public string DatabaseName;
+        public string ConnectionString { get; set; }
+        public string DatabaseName { get; set; }
     }
 
     public class AppSettings
