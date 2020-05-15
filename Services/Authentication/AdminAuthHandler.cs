@@ -12,6 +12,7 @@ namespace LuneauAuthentication.Services
 {
     public class AdminAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
+        public const string SCHEME_NAME = "AdminAuthentication";
         private readonly AdminCredentialInfos AdminCredentials;
         public AdminAuthHandler(
             IOptionsMonitor<AuthenticationSchemeOptions> options,
@@ -32,7 +33,7 @@ namespace LuneauAuthentication.Services
             var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
             if (authHeader.Scheme != "Basic")
                 return AuthenticateResult.Fail("Invalid scheme, must be Basic");
-            if (String.IsNullOrEmpty(authHeader.Parameter))
+            if (string.IsNullOrEmpty(authHeader.Parameter))
                 return AuthenticateResult.Fail("Invalid auth header for basic auth");
             var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
             var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':');
@@ -45,7 +46,7 @@ namespace LuneauAuthentication.Services
 
             var claims = new Claim[0];
             var claimIdentity = new ClaimsIdentity(claims, "basic");
-            var ticket = new AuthenticationTicket(new ClaimsPrincipal(claimIdentity), "AdminAuthentication");
+            var ticket = new AuthenticationTicket(new ClaimsPrincipal(claimIdentity), SCHEME_NAME);
 
             return AuthenticateResult.Success(ticket);
         }

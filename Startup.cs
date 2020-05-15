@@ -47,8 +47,8 @@ namespace LuneauAuthentication
         {
             services
                 .AddAuthentication()
-                .AddScheme<AuthenticationSchemeOptions, AdminAuthHandler>("AdminAuthentication", null)
-                .AddScheme<AuthenticationSchemeOptions, OrganizationAuthHandler>("OrganizationAuthentication", null);
+                .AddScheme<AuthenticationSchemeOptions, AdminAuthHandler>(AdminAuthHandler.SCHEME_NAME, null)
+                .AddScheme<AuthenticationSchemeOptions, OrganizationAuthHandler>(OrganizationAuthHandler.SCHEME_NAME, null);
         }
 
         public IMongoCollection<TDocument> GetMongoCollection<TDocument>(IServiceProvider serviceProvider, string collectionName)
@@ -66,14 +66,12 @@ namespace LuneauAuthentication
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseSwagger();
-
-            app.UseHttpsRedirection();
-
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Authentication API V1");
-            });
+            app
+                .UseSwagger()
+                .UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Authentication API V1");
+                });
 
             app.UseCors(c =>
             {

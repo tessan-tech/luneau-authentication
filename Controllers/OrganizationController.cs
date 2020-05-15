@@ -24,10 +24,12 @@ namespace LuneauAuthentication.Controllers
         }
 
         [HttpGet("token")]
-        public async Task<TokenOutput> GetToken()
+        public async Task<ActionResult<TokenOutput>> GetToken()
         {
             Guid organizationId = Guid.Parse(User.FindFirst("organizationId").Value);
             Organization organization = await OrganizationCollection.AsQueryable().FirstOrDefaultAsync(o => o.Id == organizationId);
+            if (organization == null)
+                return Forbid("Authenticated organization not found on the database");
             return new TokenOutput(JwtService.GenerateToken(organization));
         }
     }

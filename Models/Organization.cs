@@ -7,15 +7,15 @@ namespace LuneauAuthentication.Models
 {
     public class Organization
     {
+        [BsonId]
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string ApiKey { get; set; }
+
         public Organization(string name)
         {
             ApiKey = HttpUtility.UrlEncode(Convert.ToBase64String(new HMACSHA256().Key));
             Name = name;
         }
-
-        [BsonId]
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string ApiKey { get; set; }
     }
 }

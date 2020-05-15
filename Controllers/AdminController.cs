@@ -27,9 +27,9 @@ namespace LuneauAuthentication.Controllers
         [HttpPost("organization")]
         public async Task<ActionResult<Organization>> CreateOrganization(OrganizationInput input)
         {
-            var organization = new Organization(input.Name);
             if (await OrganizationCollection.AsQueryable().AnyAsync(o => o.Name == input.Name))
                 return BadRequest($"Name {input.Name} already taken");
+            var organization = new Organization(input.Name);
             await OrganizationCollection.InsertOneAsync(organization);
             return new OkObjectResult(new OrganizationOutput(organization));
         }

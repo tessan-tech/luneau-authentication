@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -20,21 +21,17 @@ namespace LuneauAuthentication.Services
         {
             JwtInfos = appSettings.Value.Jwt;
             Rsa = RSA.Create();
-            Rsa.ImportRSAPrivateKey(
-                source: Convert.FromBase64String(JwtInfos.PrivateKey),
-                bytesRead: out int _);
+            Rsa.ImportRSAPrivateKey(Convert.FromBase64String(JwtInfos.PrivateKey), out int trolo);
         }
 
         public string GenerateToken(Organization organization)
         {
-            var signingCredentials = new SigningCredentials(
-                        key: new RsaSecurityKey(Rsa),
-            algorithm: SecurityAlgorithms.RsaSha256
-);
+            var key = new RsaSecurityKey(Rsa);
+            var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
 
-            DateTime jwtDate = DateTime.UtcNow;
+            var jwtDate = DateTime.UtcNow;
 
-            Claim[] claims = new Claim[]
+            var claims = new Claim[]
             {
                 new Claim("organizationId", organization.Id.ToString()),
                 new Claim("organizationName", organization.Name)
