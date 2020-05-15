@@ -75,6 +75,12 @@ namespace LuneauAuthentication
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Authentication API V1");
             });
 
+            app.UseCors(c =>
+            {
+                c.AllowAnyOrigin();
+                c.AllowAnyHeader();
+            });
+
             app.UseRouting();
 
             app.UseAuthorization();
