@@ -10,6 +10,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Microsoft.OpenApi.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace LuneauAuthentication
 {
@@ -61,6 +64,21 @@ namespace LuneauAuthentication
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var mainclass = typeof(AsymmetricSignatureProvider)
+                       .GetField(nameof(AsymmetricSignatureProvider.DefaultMinimumAsymmetricKeySizeInBitsForSigningMap), BindingFlags.Public | BindingFlags.Static);
+            var field = mainclass.GetValue(null) as Dictionary<string, int>;
+            if (field != null)
+            {
+                field["RS256"] = 512;
+
+            }
+
+            var mainclass2 = typeof(AsymmetricSignatureProvider).GetField(nameof(AsymmetricSignatureProvider.DefaultMinimumAsymmetricKeySizeInBitsForVerifyingMap), BindingFlags.Public | BindingFlags.Static);
+            var field2 = mainclass2.GetValue(null) as Dictionary<string, int>;
+            if (field2 != null)
+            {
+                field2["RS256"] = 512;
+            }
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
